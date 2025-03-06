@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4-H Meeting Script Practice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .instructions {
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .role-select, .script-container {
+            margin-bottom: 20px;
+        }
+        .script-line {
+            margin: 10px 0;
+            padding: 5px;
+        }
+        .user-role {
+            color: red;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        .hidden {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/66/4-H_Emblem.png" alt="4-H Logo">
+        <h1>Purple Heart 4-H Club</h1>
+    </div>
+    <div class="instructions">
+        Select your role and choose if you would like your portion of the script to show on the screen.
+    </div>
+    <div class="role-select">
+        <label for="role">Choose Your Role:</label>
+        <select id="role">
+            <option value="President">President</option>
+            <option value="Vice Pres">Vice President</option>
+            <option value="Treasurer">Treasurer</option>
+            <option value="Secretary">Secretary</option>
+        </select>
+        <label>
+            <input type="checkbox" id="showText" checked> Show my lines
+        </label>
+        <button onclick="startScript()">Start Practice</button>
+    </div>
+    <div id="scriptContainer" class="script-container"></div>
+
+    <script>
+        const script = [
+            { role: "President", text: "(3 gavel taps) The business meeting of the Marvelous Movie Masters will come to order. The Pledge of Allegiance will be led by Ezekial, and Gian will lead us in the 4-H pledge." },
+            { role: "President", text: "The secretary will now call roll. Today’s roll call question is “What is your favorite movie?”" },
+            { role: "Secretary", text: "(calls roll) Ezekiel Guermonprez - Gian Guermonprez - Devin Jaggers - Nolan Peters. Mr. President, there are 4 members present which means we have a quorum." },
+            { role: "President", text: "Will the secretary please read the minutes from the previous meeting." },
+            { role: "Secretary", text: "There are no minutes as this a parliamentary procedure presentation." },
+            { role: "President", text: "Thank you. Are there any new communications for the club?" },
+            { role: "Secretary", text: "Mr. President we have one communication, a Thank You card from the Ricke Theater. (read card)" },
+            { role: "President", text: "Next we will hear officer reports, vice president?" },
+            { role: "Vice Pres", text: "Mr. President, Our next business meeting will be April 12, at 10 am. We also have our upcoming community movie night June 27th, which we will discuss in this meeting and will need to conclude all planning during the April meeting." },
+            { role: "President", text: "Thank you. Treasurer?" },
+            { role: "Treasurer", text: "Mr. President, Beginning balance: $672.33, Income: $436.44, Expenses: $199.99, Ending balance: $908.78" },
+            { role: "President", text: "Thank you, now for the report from our standing committee on fundraising." },
+            { role: "Secretary", text: "Mr. President, On February 8th, we held a viewing of Jaws at the Ricke Theater. This event had great success. We sold 257 tickets and sold a lot of concession items. After accounting for the expenses we made a profit of nearly $400. Thank you to all who helped with the event and with cleaning up the theater after the show. We are now working with the special committee to provide concessions at the community movie night and have begun discussions on our next theater showing to be held in August. We’re hoping to continue renting the Ricke Theater for these events, as it is a great theater that meets our needs well." },
+            { role: "President", text: "Thank you. A report from the special committee for the community movie night?" },
+            { role: "Vice Pres", text: "Mr. President, This month the planning committee has been working with the city to find out more about hosting our community movie night at the city pool. The rental for the pool would be $800, and the maximum capacity is 200 people. As we mentioned last month, the permit to show the movie in Andover Park is only $50, and maximum seating in the grass is for about 600. This is 3 times what the pool would limit us to and we feel is a better option for this event." },
+            { role: "President", text: "Thank you. Mr Secretary, do we have any unfinished business?" },
+            { role: "Secretary", text: "Mr. President, We have a motion on the table, the motion is: To hold the community movie night in Andover Park on Friday, June 27th." },
+            { role: "Vice Pres", text: "Mr. President, I move that we take up the motion from the table." },
+            { role: "Treasurer", text: "I second that motion." },
+            { role: "President", text: "It has been moved and seconded to take up the motion from the table, all those in favor _____. Opposed _____. Motion passed. (gavel once)" },
+            { role: "President", text: "The motion before us is to hold the community movie night in Andover Park on Friday, June 27th. Any discussion on this motion?" },
+            { role: "President", text: "Seeing no discussion, all those in favor _____. Opposed _____. Motion passed. (gavel once)" },
+            { role: "President", text: "Since that completes the unfinished business we will now entertain any new business." },
+            { role: "Vice Pres", text: "Mr. President, I move that our next movie night be held Friday, March 21st, in my home starting at 6 pm." },
+            { role: "Treasurer", text: "I second that motion." },
+            { role: "President", text: "It has been moved and seconded that our next movie night be held Friday, March 21st, in _(vice pres)_’s home starting at 6 pm… Any discussion?" },
+            { role: "Secretary", text: "I won’t be able to make it that early because of ____________. Mr. President? I move to amend the motion to start at 7:30 pm." },
+            { role: "Treasurer", text: "I second that motion." },
+            { role: "President", text: "It has been moved and seconded to amend the motion to start at 7:30 pm. Is there any discussion? all those in favor _____. Opposed _____. Motion passed. (gavel once)" },
+            { role: "President", text: "Now the motion before the club is to hold the next movie night at _(vice pres)_’s home on Friday, March 21st, starting at 7:30 pm. Is there any further discussion?" },
+            { role: "President", text: "Seeing no discussion, all those in favor _____. Opposed _____. Motion passed. (gavel once)" },
+            { role: "Vice Pres", text: "Mr. President? I move that we watch Ghostbusters at our next movie night" },
+            { role: "Treasurer", text: "I second that motion." },
+            { role: "President", text: "It has been moved and seconded that we watch Ghostbusters at our next movie night … Any discussion?" },
+            { role: "President", text: "All those in favor say Aye" },
+            { role: "Everyone", text: "Aye" },
+            { role: "President", text: "All opposed say Nay" },
+            { role: "Treasurer", text: "Nay" },
+            { role: "Vice Pres", text: "I call for a division of the house." },
+            { role: "President", text: "A division of the house has been called for, we will cast a physical vote for the same motion, all those in favor _____. Opposed _____. Motion passed. (gavel once)" },
+            { role: "Secretary", text: "Mr. President, I move that we have a veggie tray for our snack at our movie night" },
+            { role: "Vice Pres", text: "I second that motion." },
+            { role: "President", text: "It has been moved and seconded to have a veggie tray for our snack at our movie night… any discussion" },
+            { role: "Treasurer", text: "I’m allergic to fresh vegetables" },
+            { role: "Secretary", text: "Mr. President, I’d like to withdraw my motion." },
+            { role: "President", text: "Are there any objections to withdrawing the motion? Seeing none, the motion is withdrawn. Moving on." },
+            { role: "Vice Pres", text: "Mr. President, I move that our snack should be popcorn and brownies at our movie night" },
+            { role: "Treasurer", text: "I second that motion." },
+            { role: "President", text: "It’s been moved and seconded to have popcorn and brownies at our movie night… any discussion." },
+            { role: "Secretary", text: "I would like to have a different snack, like ___________" },
+            { role: "Vice Pres", text: "Mr. President, I move that we table this motion until the next meeting so that the necessary information can be acquired." },
+            { role: "Treasurer", text: "I second that motion." },
+            { role: "President", text: "It has been moved and seconded that this motion be tabled until the next meeting, all those in favor _____. Opposed _____. Motion tabled. (gavel once)" },
+            { role: "President", text: "Is there any other new business? Hearing none, are there any announcements?" },
+            { role: "Vice Pres", text: "Our next movie night is March 21st at 7:30, at _(member)’s home. Our next regular meeting is April 12 at 10 am, the roll call question will be “What is your preferred movie watching snack?”" },
+            { role: "President", text: "Thank you." },
+            { role: "Treasurer", text: "Mr. President, I move to adjourn the meeting." },
+            { role: "Secretary", text: "I second that motion." },
+            { role: "President", text: "It has been moved and seconded to adjourn the meeting all those in favor… motion passed, see you all at the movie night." }
+        ];
+
+        const voices = {
+            "President": { pitch: 1.0, rate: 1.0, volume: 1.0, voiceIndex: 0 },  // Neutral, authoritative
+            "Vice Pres": { pitch: 1.5, rate: 0.8, volume: 0.9, voiceIndex: 1 }, // High, slow
+            "Treasurer": { pitch: 0.7, rate: 1.3, volume: 1.0, voiceIndex: 2 }, // Low, fast
+            "Secretary": { pitch: 1.3, rate: 0.9, volume: 0.7, voiceIndex: 3 }  // High, soft, medium speed
+        };
+
+        const gavelSound = new Audio("https://freesound.org/data/previews/221/221521_3997517-lq.mp3"); // Shorter gavel sound
+
+        let currentLine = 0;
+        let userRole = "President";
+        let showText = true;
+        let availableVoices = [];
+
+        // Load available voices
+        window.speechSynthesis.onvoiceschanged = () => {
+            availableVoices = window.speechSynthesis.getVoices();
+        };
+        availableVoices = window.speechSynthesis.getVoices(); // Initial load
+
+        function startScript() {
+            userRole = document.getElementById("role").value;
+            showText = document.getElementById("showText").checked;
+            currentLine = 0;
+            document.getElementById("scriptContainer").innerHTML = "";
+            displayScript();
+            runScript();
+        }
+
+        function displayScript() {
+            const container = document.getElementById("scriptContainer");
+            script.forEach((line, index) => {
+                const div = document.createElement("div");
+                div.classList.add("script-line");
+                div.id = `line-${index}`;
+                if (line.role === userRole) {
+                    div.classList.add("user-role");
+                    div.textContent = showText ? line.text : "[Your turn to speak]";
+                } else {
+                    div.textContent = `${line.role}: ${line.text}`;
+                }
+                container.appendChild(div);
+            });
+        }
+
+        function runScript() {
+            if (currentLine >= script.length) return;
+
+            const line = script[currentLine];
+            const element = document.getElementById(`line-${currentLine}`);
+            element.scrollIntoView({ behavior: "smooth" });
+
+            if (line.role !== userRole && line.role !== "Everyone") {
+                element.classList.add("highlight");
+                playLine(line.text, line.role, () => {
+                    element.classList.remove("highlight");
+                    currentLine++;
+                    runScript();
+                });
+            } else if (line.role === "Everyone") {
+                element.classList.add("highlight");
+                playLine(line.text, "President", () => {
+                    element.classList.remove("highlight");
+                    currentLine++;
+                    runScript();
+                });
+            } else {
+                element.classList.add("highlight");
+                waitForUser();
+            }
+        }
+
+        function playLine(text, role, callback) {
+            let modifiedText = text.replace(/_____/g, "raise your hand");
+            const hasThreeGavelTaps = text.includes("(3 gavel taps)");
+            const hasOneGavelTap = text.includes("(gavel once)");
+
+            if (hasThreeGavelTaps || hasOneGavelTap) {
+                modifiedText = modifiedText.replace("(3 gavel taps)", "").replace("(gavel once)", "");
+                const taps = hasThreeGavelTaps ? 3 : 1;
+                playGavel(taps, () => speak(modifiedText, role, callback));
+            } else {
+                speak(modifiedText, role, callback);
+            }
+        }
+
+        function playGavel(taps, callback) {
+            let count = 0;
+            function playNext() {
+                if (count < taps) {
+                    gavelSound.currentTime = 0; // Reset to start
+                    gavelSound.play().catch(error => console.error("Gavel sound error:", error));
+                    count++;
+                    setTimeout(playNext, 500); // 500ms between taps
+                } else {
+                    setTimeout(callback, 500); // Delay speech after last tap
+                }
+            }
+            playNext();
+        }
+
+        function speak(text, role, callback) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.pitch = voices[role].pitch;
+            utterance.rate = voices[role].rate;
+            utterance.volume = voices[role].volume;
+            if (availableVoices.length > 0 && voices[role].voiceIndex < availableVoices.length) {
+                utterance.voice = availableVoices[voices[role].voiceIndex];
+            }
+            utterance.lang = "en-US";
+            utterance.onend = callback;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function waitForUser() {
+            const proceed = () => {
+                document.getElementById(`line-${currentLine}`).classList.remove("highlight");
+                currentLine++;
+                document.removeEventListener("keydown", proceed);
+                document.removeEventListener("click", proceed);
+                runScript();
+            };
+            document.addEventListener("keydown", proceed);
+            document.addEventListener("click", proceed);
+        }
+    </script>
+</body>
+</html>

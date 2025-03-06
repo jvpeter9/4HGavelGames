@@ -41,6 +41,9 @@
         .hidden {
             visibility: hidden;
         }
+        .voice-select {
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -63,6 +66,11 @@
             <input type="checkbox" id="showText" checked> Show my lines
         </label>
         <button onclick="startScript()">Start Practice</button>
+        <div class="voice-select">
+            <label for="voiceTest">Test Voices:</label>
+            <select id="voiceTest"></select>
+            <button onclick="testVoice()">Test Selected Voice</button>
+        </div>
     </div>
     <div id="scriptContainer" class="script-container"></div>
 
@@ -130,24 +138,49 @@
         ];
 
         const voices = {
-            "President": { pitch: 1.0, rate: 1.0, volume: 1.0, voiceIndex: 0 },  // Neutral, authoritative
-            "Vice Pres": { pitch: 1.5, rate: 0.8, volume: 0.9, voiceIndex: 1 }, // High, slow
-            "Treasurer": { pitch: 0.7, rate: 1.3, volume: 1.0, voiceIndex: 2 }, // Low, fast
-            "Secretary": { pitch: 1.3, rate: 0.9, volume: 0.7, voiceIndex: 3 }  // High, soft, medium speed
+            "President": { pitch: 1.0, rate: 1.0, volume: 1.0, voiceName: "Google US English" },
+            "Vice Pres": { pitch: 1.5, rate: 0.8, volume: 0.9, voiceName: "Microsoft David Desktop" },
+            "Treasurer": { pitch: 0.7, rate: 1.3, volume: 1.0, voiceName: "Microsoft Zira Desktop" },
+            "Secretary": { pitch: 1.3, rate: 0.9, volume: 0.7, voiceName: "Google UK English Female" }
         };
 
-        const gavelSound = new Audio("https://freesound.org/data/previews/221/221521_3997517-lq.mp3"); // Shorter gavel sound
+        const gavelSound = new Audio("https://freesound.org/data/previews/221/221521_3997517-lq.mp3");
 
         let currentLine = 0;
         let userRole = "President";
         let showText = true;
         let availableVoices = [];
 
-        // Load available voices
+        // Load and populate voices
         window.speechSynthesis.onvoiceschanged = () => {
             availableVoices = window.speechSynthesis.getVoices();
+            populateVoiceDropdown();
         };
-        availableVoices = window.speechSynthesis.getVoices(); // Initial load
+        availableVoices = window.speechSynthesis.getVoices();
+        if (availableVoices.length > 0) populateVoiceDropdown();
+
+        function populateVoiceDropdown() {
+            const voiceSelect = document.getElementById("voiceTest");
+            voiceSelect.innerHTML = "";
+            availableVoices.forEach((voice, index) => {
+                const option = document.createElement("option");
+                option.value = index;
+                option.text = `${voice.name} (${voice.lang})`;
+                voiceSelect.appendChild(option);
+            });
+        }
+
+        function testVoice() {
+            const voiceSelect = document.getElementById("voiceTest");
+            const selectedVoiceIndex = voiceSelect.value;
+            const voice = availableVoices[selectedVoiceIndex];
+            const utterance = new SpeechSynthesisUtterance("This is a test of the selected voice.");
+            utterance.voice = voice;
+            utterance.pitch = 1.0;
+            utterance.rate = 1.0;
+            utterance.volume = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
 
         function startScript() {
             userRole = document.getElementById("role").value;
@@ -219,12 +252,12 @@
             let count = 0;
             function playNext() {
                 if (count < taps) {
-                    gavelSound.currentTime = 0; // Reset to start
+                    gavelSound.currentTime = 0;
                     gavelSound.play().catch(error => console.error("Gavel sound error:", error));
                     count++;
-                    setTimeout(playNext, 500); // 500ms between taps
+                    setTimeout(playNext, 500);
                 } else {
-                    setTimeout(callback, 500); // Delay speech after last tap
+                    setTimeout(callback, 500);
                 }
             }
             playNext();
@@ -235,8 +268,11 @@
             utterance.pitch = voices[role].pitch;
             utterance.rate = voices[role].rate;
             utterance.volume = voices[role].volume;
-            if (availableVoices.length > 0 && voices[role].voiceIndex < availableVoices.length) {
-                utterance.voice = availableVoices[voices[role].voiceIndex];
+            const selectedVoice = availableVoices.find(voice => voice.name === voices[role].voiceName);
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            } else {
+                console.warn(`Voice '${voices[role].voiceName}' not found, using default.`);
             }
             utterance.lang = "en-US";
             utterance.onend = callback;
